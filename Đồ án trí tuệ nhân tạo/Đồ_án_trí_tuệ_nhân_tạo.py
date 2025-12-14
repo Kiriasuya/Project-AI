@@ -1,44 +1,45 @@
-﻿import math
+import math
 import random
 
-#Tính khoảng cách Euclid giữa hai thành phố
+#Hàm tính khoảng cách Euclid giữa hai thành phố a và b
 def distance(a, b): 
+    # Công thức: sqrt((x2-x1)^2 + (y2-y1)^2)
     return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
-#Tính tổng quãng đường của một tour (chu trình đóng)
-def compute_energy(tour, cities):
+#Hàm tính tổng quãng đường của toàn bộ lộ trình (TSP Distance)
+def compute_tsp_distance(tour, cities):
     total = 0
-    for i in range(len(tour)):
+    n = len(tour)
+    for i in range(n):
         city_a = cities[tour[i]]
-        city_b = cities[tour[(i + 1) % len(tour)]]
+        # tour[(i + 1) % n] giúp nối thành phố cuối cùng về lại thành phố đầu tiên
+        city_b = cities[tour[(i + 1) % n]]
         total += distance(city_a, city_b)
     return total
 
 #Tạo nghiệm láng giềng ngẫu nhiên bằng cách hoán đổi vị trí của hai thành phố trong tour
-def two_opt_move(tour, cities):
+def get_neighbor(tour, cities):
     n = len(tour)
-    #Chọn hai chỉ số i, j ngẫu nhiên sao cho i < j
+    # Chọn ngẫu nhiên hai vị trí i và j để thực hiện đảo đoạn
     i = random.randint(0, n - 2)
     j = random.randint(i + 1, n - 1)
 
-    # TRƯỜNG HỢP ĐẶC BIỆT: đảo toàn bộ tour -> năng lượng không đổi
-    if i == 0 and j == n - 1:
-        new_tour = list(reversed(tour))
-        return new_tour, 0.0
-
+    # Tính toán chênh lệch khoảng cách (delta_e) thay vì tính lại từ đầu
     a = tour[i - 1] if i > 0 else tour[-1]
     b = tour[i]
     c = tour[j]
     d = tour[j + 1] if j < n - 1 else tour[0]
 
+    # Hiệu số giữa các cạnh mới (a-c, b-d) và các cạnh cũ (a-b, c-d)
     old_edges = distance(cities[a], cities[b]) + distance(cities[c], cities[d])
     new_edges = distance(cities[a], cities[c]) + distance(cities[b], cities[d])
     delta_e = new_edges - old_edges
 
-    new_tour = tour[:]
-    new_tour[i:j+1] = reversed(new_tour[i:j+1]) #đảo đoạn từ i đến j
+    # Tạo nghiệm láng giềng bằng cách đảo ngược đoạn từ i đến j
+    neighbor_tour = tour[:]
+    neighbor_tour[i:j+1] = reversed(neighbor_tour[i:j+1])
 
-    return new_tour, delta_e
+    return neighbor_tour, delta_e
 
 
 
