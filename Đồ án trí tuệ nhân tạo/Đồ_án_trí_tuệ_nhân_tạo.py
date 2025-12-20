@@ -1,4 +1,4 @@
-﻿import math
+import math
 import random
 
 #Tính khoảng cách Euclid giữa hai thành phố
@@ -164,3 +164,44 @@ if __name__ == "__main__":
     best, dist = simulated_annealing(cities, max_iter=20000, log=True)
     print("Best tour:", best)
     print("Distance:", dist)
+
+def sa_generator(cities, max_iter=100000):
+    n = len(cities)
+
+    T = estimate_initial_temperature(cities)
+    T_min = estimate_T_min(cities)
+
+    current = list(range(n))
+    random.shuffle(current)
+    current_energy = compute_energy(current, cities)
+
+    best = current[:]
+    best_energy = current_energy
+
+    accepted = attempted = 0
+
+    for step in range(max_iter):
+        attempted += 1
+
+        new, dE = two_opt_move(current, cities)
+
+        if dE < 0 or random.random() < math.exp(-dE / T):
+            current = new
+            current_energy += dE
+            accepted += 1
+
+        if current_energy < best_energy:
+            best = current[:]
+            best_energy = current_energy
+
+        if step % 500 == 0:
+            yield current, best, current_energy, best_energy
+
+            rate = accepted / attempted if attempted > 0 else 0
+            T *= adaptive_alpha(rate)
+            accepted = attempted = 0
+
+        if T < T_min:
+            break
+
+
