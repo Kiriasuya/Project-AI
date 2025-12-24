@@ -1,47 +1,6 @@
 import math
 import random
 
-#Tính khoảng cách Euclid giữa hai thành phố
-def distance(a, b): 
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-
-#Tính tổng quãng đường của một tour (chu trình đóng)
-def compute_energy(tour, cities):
-    total = 0
-    for i in range(len(tour)):
-        city_a = cities[tour[i]]
-        city_b = cities[tour[(i + 1) % len(tour)]]
-        total += distance(city_a, city_b)
-    return total
-
-#Tạo nghiệm láng giềng ngẫu nhiên bằng cách hoán đổi vị trí của hai thành phố trong tour
-def two_opt_move(tour, cities):
-    n = len(tour)
-    #Chọn hai chỉ số i, j ngẫu nhiên sao cho i < j
-    i = random.randint(0, n - 2)
-    j = random.randint(i + 1, n - 1)
-
-    # TRƯỜNG HỢP ĐẶC BIỆT: đảo toàn bộ tour -> năng lượng không đổi
-    if i == 0 and j == n - 1:
-        new_tour = list(reversed(tour))
-        return new_tour, 0.0
-
-    a = tour[i - 1] if i > 0 else tour[-1]
-    b = tour[i]
-    c = tour[j]
-    d = tour[j + 1] if j < n - 1 else tour[0]
-
-    old_edges = distance(cities[a], cities[b]) + distance(cities[c], cities[d])
-    new_edges = distance(cities[a], cities[c]) + distance(cities[b], cities[d])
-    delta_e = new_edges - old_edges
-
-    new_tour = tour[:]
-    new_tour[i:j+1] = reversed(new_tour[i:j+1]) #đảo đoạn từ i đến j
-
-    return new_tour, delta_e
-
-
-
 #Tự động ước lượng nhiệt độ ban đầu sao cho xác suất chấp nhận nghiệm xấu phù hợp với bài toán
 def estimate_initial_temperature(cities, sample_size=200):
     n = len(cities)
@@ -203,5 +162,6 @@ def sa_generator(cities, max_iter=100000):
 
         if T < T_min:
             break
+
 
 
